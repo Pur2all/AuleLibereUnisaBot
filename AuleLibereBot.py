@@ -16,10 +16,10 @@ def make_buildings_keyboard_markup():
     return markup
 
 
-def make_classroom_keyboard_markup(building_of_classroom):
+def make_classroom_keyboard_markup(building):
     markup = telebot.types.ReplyKeyboardMarkup()
     buttons = []
-    values = rooms_for_buildings[building_of_classroom]
+    values = rooms_for_buildings[building]
 
     for value in values:
         temp_button = telebot.types.KeyboardButton(value)
