@@ -16,10 +16,10 @@ def make_buildings_keyboard_markup():
     return markup
 
 
-def make_classroom_keyboard_markup(building):
+def make_classroom_keyboard_markup(building_of_classroom):
     markup = telebot.types.ReplyKeyboardMarkup()
     buttons = []
-    values = rooms_for_buildings[building]
+    values = rooms_for_buildings[building_of_classroom]
 
     for value in values:
         temp_button = telebot.types.KeyboardButton(value)
@@ -36,7 +36,7 @@ building: str = None
 
 @bot.message_handler(commands=["start"])
 def send_welcome(message):
-    bot.send_message(message.chat.id, "Bla bla bla")
+    bot.send_message(message.chat.id, "Questo è un bot per cercare le aule libere ad Unisa, buona fortuna!")
 
 
 @bot.message_handler(commands=["edifici"])
