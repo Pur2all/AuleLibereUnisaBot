@@ -1,1 +1,1 @@
-worker: python3 AuleLibereBot.py
+worker: python AuleLibereBot.py
