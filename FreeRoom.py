@@ -83,7 +83,7 @@ def extract_free_time(list_of_full_hours):
 
 
 # Se vuoi farlo per un aula singola il parametro da mettere è quello dell'ID del JSON, ad esempio P11 è FINV-13CP01003
-def get_all_rooms_events(of_building=None):
+def get_all_rooms_events_for_building(of_building=None):
     assert of_building is not None
 
     global response
@@ -97,5 +97,8 @@ def get_all_rooms_events(of_building=None):
         occupied_from, occupied_to = datetime.datetime.fromtimestamp(event["timestamp_from"]), \
                                          datetime.datetime.fromtimestamp(event["timestamp_to"])
         room_events[event["NomeAula"]] += [(occupied_from, occupied_to)]
+    
+    for room, room_event in room_events.items():
+        room_events[room] = extract_free_time(room_event)
 
     return room_events
