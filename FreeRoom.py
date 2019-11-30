@@ -31,6 +31,8 @@ buildings = {
 
 rooms_for_buildings = defaultdict(list)
 
+events = None
+
 url = "https://easycourse.unisa.it/AgendaStudenti//rooms_call.php"
 
 
@@ -86,10 +88,11 @@ def extract_free_time(list_of_full_hours):
 def get_all_rooms_events_for_building(of_building=None):
     assert of_building is not None
 
-    global response
+    global events
 
-    response = requests.get(url, params={"sede": buildings[of_building]})
-    events = json.loads(response.content.decode("utf8"))["events"]
+    if not events:
+        response = requests.get(url, params={"sede": buildings[of_building]})
+        events = json.loads(response.content.decode("utf8"))["events"]
 
     room_events = defaultdict(list)
 

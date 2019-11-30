@@ -1,5 +1,6 @@
 import telebot
 import FreeRoom
+import datetime
 
 TOKEN = "783944951:AAHdmcNjyI-8fZsSKv_-hIMp5MLeBkbDUvc"
 
@@ -46,7 +47,10 @@ def print_buildings_keyboard(message):
     prev_command = message.text.replace("/", "")
     markup = make_buildings_keyboard_markup()
 
-    bot.send_message(message.chat.id, "Scegli un edificio:", reply_markup=markup)
+    if datetime.date.today().weekday() != 5 and datetime.date.today().weekday() != 6:
+        bot.send_message(message.chat.id, "Scegli un edificio:", reply_markup=markup)
+    else:
+        bot.send_message(message.chat.id, "Oggi l'università è chiusa, studia a casa!")
 
 
 @bot.message_handler(func=lambda message: prev_command == "aula" and message.text in FreeRoom.buildings)
