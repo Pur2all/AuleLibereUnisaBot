@@ -51,6 +51,7 @@ def print_buildings_keyboard(message):
         bot.send_message(message.chat.id, "Scegli un edificio:", reply_markup=markup)
     else:
         bot.send_message(message.chat.id, "Oggi l'università è chiusa, studia a casa!")
+        prev_command = None
 
 
 @bot.message_handler(func=lambda message: prev_command == "aula" and message.text in FreeRoom.buildings)
