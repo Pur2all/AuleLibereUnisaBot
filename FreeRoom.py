@@ -90,18 +90,19 @@ def get_all_rooms_events_for_building(of_building=None):
 
     global events
 
-    if not events:
-        response = requests.get(url, params={"sede": buildings[of_building]})
-        events = json.loads(response.content.decode("utf8"))["events"]
+    response = requests.get(url, params={"sede": buildings[of_building]})
+    events = json.loads(response.content.decode("utf8"))["events"]
 
-    room_events = defaultdict(list)
+    room_events = {}
+    for room in rooms_for_buildings[buildings[of_building]]:
+        room_events[room] = []
 
     for event in events:
         occupied_from, occupied_to = datetime.datetime.fromtimestamp(event["timestamp_from"]), \
                                          datetime.datetime.fromtimestamp(event["timestamp_to"])
         room_events[event["NomeAula"]] += [(occupied_from, occupied_to)]
     
-    for room, room_event in room_events.items():
-        room_events[room] = extract_free_time(room_event)
+    for room, list_of_events_for_room in room_events.items():
+        room_events[room] = extract_free_time(list_of_events_for_room)
 
     return room_events
