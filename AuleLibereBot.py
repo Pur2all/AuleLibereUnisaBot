@@ -65,7 +65,7 @@ def send_welcome(message):
     bot.send_message(message.chat.id, "Questo è un bot per cercare le aule libere ad Unisa, buona fortuna!")
 
 
-@bot.message_handler(func=lambda message: "/admin_message" in message.text and message.from_user.id in admins)
+@bot.message_handler(func=lambda message: "/admin_message" in message.text and str(message.from_user.id) in admins)
 def send_message_to_all_users(message):
     message = re.search(r"(?<=\/admin_message ).+", message.text).group()
     for user in users:
