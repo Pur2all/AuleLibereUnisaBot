@@ -1,8 +1,25 @@
 import telebot
 import FreeRoom
 import datetime
+import os 
+import redis
+import re
+import time
 
 TOKEN = "783944951:AAHdmcNjyI-8fZsSKv_-hIMp5MLeBkbDUvc"
+
+
+def get_redis_info():
+    redis_url = os.environ["REDIS_URL"]
+
+    url_splitted = re.findall(r"([^:\/@]+)", redis_url)
+
+    redis_user = url_splitted[1]
+    redis_password = url_splitted[2]
+    redis_host = url_splitted[3]
+    redis_port = url_splitted[4]
+
+    return redis_host, redis_port, redis_user, redis_password
 
 
 def make_buildings_keyboard_markup():
@@ -33,41 +50,57 @@ def make_classroom_keyboard_markup(building):
 FreeRoom.setup()
 bot = telebot.TeleBot(TOKEN)
 building : str = None
-prev_command : str = None
+prev_command : dict = {}
+redis_info = get_redis_info()
+redis_connection = redis.Redis(redis_info[0], redis_info[1], client_name=redis_info[2], password=redis_info[3], decode_responses=True)
+admins = os.environ("ADMINS").split(";")
+users = redis_connection.hgetall("users")
+
 
 @bot.message_handler(commands=["start"])
 def send_welcome(message):
+    users[message.from_user.id] = "start"
+    redis_connection.hmset("users", users)
+
     bot.send_message(message.chat.id, "Questo è un bot per cercare le aule libere ad Unisa, buona fortuna!")
+
+
+@bot.message_handler(func=lambda message: "/admin_message" in message.text and message.from_user.id in admins)
+def send_message_to_all_users(message):
+    message = re.search(r"(?<=\/admin_message ).+", message.text).group()
+    for user in users:
+        bot.send_message(user, message)
 
 
 @bot.message_handler(commands=["edifici", "aula"])
 def print_buildings_keyboard(message):
-    global prev_command
-
-    prev_command = message.text.replace("/", "")
     markup = make_buildings_keyboard_markup()
+    prev_command = None
 
-    if datetime.date.today().weekday() != 5 and datetime.date.today().weekday() != 6:
+    if datetime.date.today().weekday() < 5:
+        prev_command = message.text.replace("/", "")
+
         bot.send_message(message.chat.id, "Scegli un edificio:", reply_markup=markup)
     else:
         bot.send_message(message.chat.id, "Oggi l'università è chiusa, studia a casa!")
-        prev_command = None
+    
+    users[message.from_user.id] = prev_command
 
 
-@bot.message_handler(func=lambda message: prev_command == "aula" and message.text in FreeRoom.buildings)
+@bot.message_handler(func=lambda message: users[message.from_user.id] == "aula" and message.text in FreeRoom.buildings)
 def print_classrooms_keyboard(message):
     global building
-
+    
     building = message.text
     markup_classroom = make_classroom_keyboard_markup(building)
 
     bot.send_message(message.chat.id, "Scegli una classe:", reply_markup=markup_classroom)
 
 
-@bot.message_handler(func=lambda message: prev_command == "edifici" and message.text in FreeRoom.buildings)
+@bot.message_handler(func=lambda message: users[message.from_user.id] == "edifici" and message.text in FreeRoom.buildings)
 def print_free_hours_for_building(message):
     global building
-    
+
     building = message.text
     free_times = FreeRoom.get_all_rooms_events_for_building(building)
     format_string = ""
@@ -81,7 +114,7 @@ def print_free_hours_for_building(message):
     bot.send_message(message.chat.id, format_string, reply_markup=telebot.types.ReplyKeyboardRemove())
 
 
-@bot.message_handler(func=lambda message: prev_command == "aula" and message.text in FreeRoom.rooms_for_buildings[FreeRoom.buildings[building]])
+@bot.message_handler(func=lambda message: users[message.from_user.id] == "aula" and message.text in FreeRoom.rooms_for_buildings[FreeRoom.buildings[building]])
 def print_free_hours_for_classroom(message):
     free_times = FreeRoom.get_all_rooms_events_for_building(building)[message.text]
 
@@ -94,3 +127,7 @@ def print_free_hours_for_classroom(message):
 
 
 bot.polling(none_stop=False)
+
+while True:
+    time.sleep(60*60)
+    redis_connection.hmset("users", users)
