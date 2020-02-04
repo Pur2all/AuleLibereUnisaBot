@@ -52,8 +52,8 @@ def format_time(list_of_times):
 
     for i in range(len_of_list):
         start, end = list_of_times[i][0], list_of_times[i][1]
-        list_of_times[i] = ("{:02d}:{:02d}".format(start.hour, start.minute),
-                            "{:02d}:{:02d}".format(end.hour, end.minute))
+        list_of_times[i] = (f"{start.hour:02d}:{start.minute:02d}",
+                            f"{end.hour:02d}:{end.minute:02d}")
 
     return list_of_times
 
@@ -85,16 +85,16 @@ def extract_free_time(list_of_full_hours):
 
 
 # Se vuoi farlo per un aula singola il parametro da mettere è quello dell'ID del JSON, ad esempio P11 è FINV-13CP01003
-def get_all_rooms_events_for_building(of_building=None):
-    assert of_building is not None
+def get_all_rooms_events_for_building(building=None):
+    assert building is not None
 
     global events
 
-    response = requests.get(url, params={"sede": buildings[of_building]})
+    response = requests.get(url, params={"sede": buildings[building]})
     events = json.loads(response.content.decode("utf8"))["events"]
 
     room_events = {}
-    for room in rooms_for_buildings[buildings[of_building]]:
+    for room in rooms_for_buildings[buildings[building]]:
         room_events[room] = []
 
     for event in events:
