@@ -53,7 +53,7 @@ building : str = None
 prev_command : dict = {}
 redis_info = get_redis_info()
 redis_connection = redis.Redis(redis_info[0], redis_info[1], client_name=redis_info[2], password=redis_info[3], decode_responses=True)
-admins = os.environ("ADMINS").split(";")
+admins = os.environ["ADMINS"].split(";")
 users = redis_connection.hgetall("users")
 
 
