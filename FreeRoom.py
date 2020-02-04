@@ -65,7 +65,7 @@ def extract_free_time(list_of_full_hours):
 
     today = datetime.datetime.today()
     start_of_the_day = datetime.datetime(today.year, today.month, today.day, hour=8, minute=30)
-    end_of_the_day = datetime.datetime(today.year, today.month, today.day, hour=19, minute=0)
+    end_of_the_day = datetime.datetime(today.year, today.month, today.day, hour=19, minute=30)
 
     list_of_full_hours.insert(0, (None, start_of_the_day))
     list_of_full_hours.append((end_of_the_day, None))

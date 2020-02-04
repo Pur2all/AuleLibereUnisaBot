@@ -106,9 +106,12 @@ def print_free_hours_for_building(message):
     format_string = ""
 
     for room, free in free_times.items():
-        format_string += room + " è libera nei seguenti orari:\n"
-        for interval in free:
-            format_string += "- Dalle " + interval[0] + " alle " + interval[1] + "\n"
+        if not free:
+            format_string += room + " è occupata tutto il giorno\n"
+        else:
+            format_string += room + " è libera nei seguenti orari:\n"
+            for interval in free:
+                format_string += "- Dalle " + interval[0] + " alle " + interval[1] + "\n"
         format_string += "\n\n"
 
     bot.send_message(message.chat.id, format_string, reply_markup=telebot.types.ReplyKeyboardRemove())
@@ -117,11 +120,14 @@ def print_free_hours_for_building(message):
 @bot.message_handler(func=lambda message: users[message.from_user.id] == "aula" and message.text in FreeRoom.rooms_for_buildings[FreeRoom.buildings[building]])
 def print_free_hours_for_classroom(message):
     free_times = FreeRoom.get_all_rooms_events_for_building(building)[message.text]
+    
+    if not free_times:
+        format_string = "L'aula è occupata tutto il giorno"
+    else:
+        format_string = "L'aula è libera nei seguenti orari:\n"
 
-    format_string = "L'aula è libera nei seguenti orari:\n"
-
-    for time in free_times:
-        format_string += "- Dalle " + time[0] + " alle " + time[1] + "\n"
+        for time in free_times:
+            format_string += "- Dalle " + time[0] + " alle " + time[1] + "\n"
 
     bot.send_message(message.chat.id, format_string, reply_markup=telebot.types.ReplyKeyboardRemove())
 
