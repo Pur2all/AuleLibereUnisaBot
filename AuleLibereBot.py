@@ -87,7 +87,7 @@ def print_buildings_keyboard(message):
     users[message.from_user.id] = prev_command
 
 
-@bot.message_handler(func=lambda message: users[message.from_user.id] == "aula" and message.text in FreeRoom.buildings)
+@bot.message_handler(func=lambda message: users.get(message.from_user.id) == "aula" and message.text in FreeRoom.buildings)
 def print_classrooms_keyboard(message):
     global building
     
@@ -97,7 +97,7 @@ def print_classrooms_keyboard(message):
     bot.send_message(message.chat.id, "Scegli una classe:", reply_markup=markup_classroom)
 
 
-@bot.message_handler(func=lambda message: users[message.from_user.id] == "edifici" and message.text in FreeRoom.buildings)
+@bot.message_handler(func=lambda message: users.get(message.from_user.id) == "edifici" and message.text in FreeRoom.buildings)
 def print_free_hours_for_building(message):
     global building
 
@@ -117,7 +117,7 @@ def print_free_hours_for_building(message):
     bot.send_message(message.chat.id, format_string, reply_markup=telebot.types.ReplyKeyboardRemove())
 
 
-@bot.message_handler(func=lambda message: users[message.from_user.id] == "aula" and message.text in FreeRoom.rooms_for_buildings[FreeRoom.buildings[building]])
+@bot.message_handler(func=lambda message: users.get(message.from_user.id) == "aula" and message.text in FreeRoom.rooms_for_buildings[FreeRoom.buildings[building]])
 def print_free_hours_for_classroom(message):
     free_times = FreeRoom.get_all_rooms_events_for_building(building)[message.text]
     
