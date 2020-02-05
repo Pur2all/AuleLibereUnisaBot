@@ -1,6 +1,6 @@
 import datetime
-import requests
 import json
+import requests
 from collections import defaultdict
 
 buildings = {
