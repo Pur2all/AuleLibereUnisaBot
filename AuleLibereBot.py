@@ -6,7 +6,7 @@ import redis
 import re
 import time
 
-TOKEN = "783944951:AAHdmcNjyI-8fZsSKv_-hIMp5MLeBkbDUvc"
+TOKEN_BOT = os.environ["TOKEN_BOT"]
 
 
 def get_redis_info():
@@ -48,7 +48,7 @@ def make_classroom_keyboard_markup(building):
 
 
 FreeRoom.setup()
-bot = telebot.TeleBot(TOKEN)
+bot = telebot.TeleBot(TOKEN_BOT)
 building : str = None
 prev_command : dict = {}
 redis_info = get_redis_info()
