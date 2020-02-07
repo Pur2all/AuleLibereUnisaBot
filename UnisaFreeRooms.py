@@ -40,11 +40,11 @@ def setup():
     global rooms_for_buildings
 
     response = requests.get(url)
-    area_rooms = json.loads(response.content.decode("utf8"))["area_rooms"]
+    area_rooms = json.loads(response.content.decode("utf8"))["area_rooms"] # Getting dictionary key:building, value:rooms
 
-    for key, value in area_rooms.items():
-        for room_id, data in value.items():
-            rooms_for_buildings[key].append(data["room_name"])
+    for building, rooms in area_rooms.items():
+        for room_data in rooms.values():
+            rooms_for_buildings[building].append(room_data["room_name"]) # Append name of rooms 
 
 
 def format_time(list_of_times):
@@ -84,7 +84,6 @@ def extract_free_time(list_of_full_hours):
     return format_time(list_of_free_hours)
 
 
-# Se vuoi farlo per un aula singola il parametro da mettere è quello dell'ID del JSON, ad esempio P11 è FINV-13CP01003
 def get_all_rooms_events_for_building(building=None):
     assert building is not None
 
