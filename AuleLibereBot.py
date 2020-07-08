@@ -153,7 +153,7 @@ def print_free_hours_for_classroom(message):
 
     set_user_prev_command(message.from_user.id, None)
 
-update_db_thread = threading.Thread(target=update_db_thread)
+update_db_thread = threading.Thread(target=update_db_thread, daemon=True)
 update_db_thread.start()
 
 bot.polling(none_stop=False)
