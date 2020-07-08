@@ -5,6 +5,7 @@ import re
 import redis
 import telebot
 import time
+import threading
 
 
 TOKEN_BOT = os.environ["TOKEN_BOT"]
@@ -59,6 +60,12 @@ def make_classroom_keyboard_markup(building):
 
 def set_user_prev_command(user_id, prev_command):
     users[user_id] = prev_command
+
+
+def update_users_db():
+    while True:
+        time.sleep(60 * 60)
+        redis_connection.hmset("users", users)
 
 
 UnisaFreeRooms.setup()
@@ -146,9 +153,7 @@ def print_free_hours_for_classroom(message):
 
     set_user_prev_command(message.from_user.id, None)
 
+update_db_thread = threading.Thread(target=update_db_thread)
+update_db_thread.start()
 
 bot.polling(none_stop=False)
-
-while True:
-    time.sleep(60*60)
-    redis_connection.hmset("users", users)
