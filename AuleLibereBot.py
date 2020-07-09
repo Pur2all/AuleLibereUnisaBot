@@ -135,7 +135,7 @@ def print_free_hours_for_building(message):
 
     bot.send_message(message.chat.id, format_string, reply_markup=telebot.types.ReplyKeyboardRemove())
 
-    set_user_prev_command(message.from_user.id, None)
+    set_user_prev_command(message.from_user.id, "None")
 
 
 @bot.message_handler(func=lambda message: users.get(message.from_user.id) == "aula" and message.text in UnisaFreeRooms.rooms_for_buildings[UnisaFreeRooms.buildings[selected_building_for_user[message.from_user.id]]])
@@ -152,7 +152,7 @@ def print_free_hours_for_classroom(message):
 
     bot.send_message(message.chat.id, format_string, reply_markup=telebot.types.ReplyKeyboardRemove())
 
-    set_user_prev_command(message.from_user.id, None)
+    set_user_prev_command(message.from_user.id, "None")
 
 update_db_thread = threading.Thread(target=update_users_db, daemon=True)
 update_db_thread.start()
