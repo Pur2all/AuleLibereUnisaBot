@@ -66,6 +66,7 @@ def update_users_db():
     while True:
         time.sleep(60 * 60)
         redis_connection.hmset("users", users)
+        print("Users db updated")
 
 
 UnisaFreeRooms.setup()
