@@ -91,6 +91,7 @@ def send_message_to_all_users(message):
 
     for user in users:
         bot.send_message(user, message)
+        time.sleep(0.1)
 
 
 @bot.message_handler(commands=["edifici", "aula"])
