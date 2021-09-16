@@ -12,23 +12,9 @@ TOKEN_BOT = os.environ["TOKEN_BOT"]
 ADMINS = os.environ["ADMINS"].split(";")
 
 
-def get_redis_info():
-    redis_url = os.environ["REDIS_URL"]
-
-    url_splitted = re.findall(r"([^:\/@]+)", redis_url)
-
-    redis_user = url_splitted[1]
-    redis_password = url_splitted[2]
-    redis_host = url_splitted[3]
-    redis_port = url_splitted[4]
-
-    return redis_host, redis_port, redis_user, redis_password
-
-
 def get_redis_connection():
-    redis_info = get_redis_info()
 
-    return redis.Redis(redis_info[0], redis_info[1], client_name=redis_info[2], password=redis_info[3], decode_responses=True)
+    return redis.from_url(os.environ["REDIS_URL"], decode_responses=True)
 
 
 def make_buildings_keyboard_markup():
