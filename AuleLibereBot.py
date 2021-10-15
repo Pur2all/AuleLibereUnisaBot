@@ -68,7 +68,9 @@ def send_welcome(message):
 
     redis_connection.hmset("users", users)
 
-    bot.send_message(message.chat.id, "Questo è un bot per cercare le aule libere ad Unisa, buona fortuna!")
+    bot.send_message(message.chat.id,
+    "Questo è un bot per cercare le aule libere ad Unisa, buona fortuna!\n\n \
+    Invia /help per avere una breve descrizione del bot")
 
 
 @bot.message_handler(func=lambda message: "/admin_message" in message.text and str(message.from_user.id) in ADMINS)
@@ -95,6 +97,23 @@ def print_buildings_keyboard(message):
     set_user_prev_command(message.from_user.id, prev_command)
 
 
+@bot.message_handler(commands=["help"])
+def print_help_message(message):
+    set_user_prev_command(message.from_user.id, "None")
+
+    bot.send_message(message.chat.id,
+        "Questo bot ti permette di conoscere le aule libere in tutta l'Università degli Studi di Salerno \n \
+        Descrizione comandi: \n \
+            \t /help - Mostra questo messaggio \n \
+            \t /edifici - Mostra gli orari liberi delle aule nell'edificio scelto \n \
+            \t /aula - Mostra gli orari liberi di una precisa aula \n \
+            \t /now_edifici - Mostra le aule libere in un preciso edificio in questo esatto momento e fino a quando \n \
+        \n\n\n \
+        Per qualsiasi problema contattare @BondedByBlood \n \
+        Il codice di questo bot è pubblico, lo puoi trovare cliccando su questo link -> https://github.com/Pur2all/AuleLibereUnisaBot \n \
+        Sentiti libero di contribuire!")
+
+
 @bot.message_handler(func=lambda message: users.get(message.from_user.id) == "aula" and message.text in UnisaFreeRooms.buildings)
 def print_classrooms_keyboard(message):
     building = message.text
@@ -108,7 +127,7 @@ def print_classrooms_keyboard(message):
 @bot.message_handler(func=lambda message: users.get(message.from_user.id) == "edifici" and message.text in UnisaFreeRooms.buildings)
 def print_free_hours_for_building(message):
     building = message.text
-    free_times = UnisaFreeRooms.get_all_rooms_events_for_building(building)
+    free_times = UnisaFreeRooms.format_time(UnisaFreeRooms.get_all_rooms_events_for_building(building))
     format_string = ""
 
     for room, free in free_times.items():
@@ -127,7 +146,7 @@ def print_free_hours_for_building(message):
 
 @bot.message_handler(func=lambda message: users.get(message.from_user.id) == "aula" and message.text in UnisaFreeRooms.rooms_for_buildings[UnisaFreeRooms.buildings[selected_building_for_user[message.from_user.id]]])
 def print_free_hours_for_classroom(message):
-    free_times = UnisaFreeRooms.get_all_rooms_events_for_building(selected_building_for_user[message.from_user.id])[message.text]
+    free_times = UnisaFreeRooms.format_time(UnisaFreeRooms.get_all_rooms_events_for_building(selected_building_for_user[message.from_user.id]))[message.text]
     
     if not free_times:
         format_string = "L'aula è occupata tutto il giorno"

@@ -1,5 +1,6 @@
 import datetime
 import json
+from time import time
 import requests
 from collections import defaultdict
 
@@ -47,6 +48,17 @@ def setup():
             rooms_for_buildings[building].append(room_data["room_name"]) # Append name of rooms 
 
 
+def get_only_time(list_of_times):
+    len_of_list = len(list_of_times)
+
+    for i in range(len_of_list):
+        start, end = list_of_times[i][0], list_of_times[i][1]
+        list_of_times[i] = (datetime.time(hour=start.hour, minute=start.minute),
+                            datetime.time(hour=end.hour, minute=end.minute))
+
+    return list_of_times
+
+
 def format_time(list_of_times):
     len_of_list = len(list_of_times)
 
@@ -81,7 +93,7 @@ def extract_free_time(list_of_full_hours):
 
         i += 1
 
-    return format_time(list_of_free_hours)
+    return get_only_time(list_of_free_hours)
 
 
 def get_all_rooms_events_for_building(building=None):
@@ -105,3 +117,34 @@ def get_all_rooms_events_for_building(building=None):
         room_events[room] = extract_free_time(list_of_events_for_room)
 
     return room_events
+
+
+def get_all_free_rooms_right_now(building=None):
+    assert building is not None
+
+    format_string = ""
+
+    now = datetime.datetime.now()
+    now = datetime.time(hour=now.hour, minute=now.minute)
+
+    free_times = get_all_rooms_events_for_building(building)
+    building_free_times_from_now = f"Nell'edificio {building} ci sono le seguenti aule libere in questo momento:\n"
+    
+    for room, free in free_times.items():
+        if free:
+            room_free_times_from_now = ""
+
+            for start_free, end_free in free:
+                if start_free < now < end_free:
+                    room_free_times_from_now += f"fino alle {end_free.hour:02d}:{end_free.minute:02d}\n"
+                    break
+            
+            if room_free_times_from_now != "":
+                building_free_times_from_now += f"{room} è libera {room_free_times_from_now}"
+
+    if "libera" not in building_free_times_from_now:
+        building_free_times_from_now = f"Nell'edificio {building} non ci sono aule libere in questo momento\n"
+    
+    format_string += building_free_times_from_now
+    
+    return format_string
