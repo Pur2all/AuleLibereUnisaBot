@@ -77,7 +77,7 @@ def send_welcome(message):
 def send_message_to_all_users(message):
     message = re.search(r"(?<=\/admin_message ).+", message.text).group()
 
-    for user in users:
+    for user in list(users):
         try:
             bot.send_message(user, message)
         except Exception:
