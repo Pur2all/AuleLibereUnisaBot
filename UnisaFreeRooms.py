@@ -63,7 +63,7 @@ def format_time(list_of_times):
     len_of_list = len(list_of_times)
 
     for i in range(len_of_list):
-        start, end = list_of_times[i][0], list_of_times[i][1]
+        start, end = list_of_times[i], list_of_times[i]
         list_of_times[i] = (f"{start.hour:02d}:{start.minute:02d}",
                             f"{end.hour:02d}:{end.minute:02d}")
 

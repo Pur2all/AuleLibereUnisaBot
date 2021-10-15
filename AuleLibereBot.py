@@ -69,8 +69,7 @@ def send_welcome(message):
     redis_connection.hmset("users", users)
 
     bot.send_message(message.chat.id,
-    "Questo è un bot per cercare le aule libere ad Unisa, buona fortuna!\n\n \
-    Invia /help per avere una breve descrizione del bot")
+    "Questo è un bot per cercare le aule libere ad Unisa, buona fortuna!\n\nInvia /help per avere una breve descrizione del bot")
 
 
 @bot.message_handler(func=lambda message: "/admin_message" in message.text and str(message.from_user.id) in ADMINS)
@@ -82,7 +81,7 @@ def send_message_to_all_users(message):
         time.sleep(0.1)
 
 
-@bot.message_handler(commands=["edifici", "aula"])
+@bot.message_handler(commands=["edifici", "aula", "now_edifici"])
 def print_buildings_keyboard(message):
     markup = make_buildings_keyboard_markup()
     prev_command = None
@@ -101,17 +100,18 @@ def print_buildings_keyboard(message):
 def print_help_message(message):
     set_user_prev_command(message.from_user.id, "None")
 
-    bot.send_message(message.chat.id,
-        "Questo bot ti permette di conoscere le aule libere in tutta l'Università degli Studi di Salerno \n \
-        Descrizione comandi: \n \
-            \t /help - Mostra questo messaggio \n \
-            \t /edifici - Mostra gli orari liberi delle aule nell'edificio scelto \n \
-            \t /aula - Mostra gli orari liberi di una precisa aula \n \
-            \t /now_edifici - Mostra le aule libere in un preciso edificio in questo esatto momento e fino a quando \n \
-        \n\n\n \
-        Per qualsiasi problema contattare @BondedByBlood \n \
-        Il codice di questo bot è pubblico, lo puoi trovare cliccando su questo link -> https://github.com/Pur2all/AuleLibereUnisaBot \n \
-        Sentiti libero di contribuire!")
+    help_message = "Questo bot ti permette di conoscere le aule libere in tutta l'Università degli Studi di Salerno \n" + \
+        "Descrizione comandi: \n" + \
+        "/help - Mostra questo messaggio \n" + \
+        "/edifici - Mostra gli orari liberi delle aule nell'edificio scelto \n" + \
+        "/aula - Mostra gli orari liberi di una precisa aula \n" + \
+        "/now_edifici - Mostra le aule libere in un preciso edificio in questo esatto momento e fino a quando \n" + \
+        "\n\n\n" + \
+        "Per qualsiasi problema contattare @BondedByBlood \n" + \
+        "Il codice di questo bot è pubblico, lo puoi trovare cliccando su questo link -> https://github.com/Pur2all/AuleLibereUnisaBot \n" + \
+        "Sentiti libero di contribuire!"
+
+    bot.send_message(message.chat.id, help_message)
 
 
 @bot.message_handler(func=lambda message: users.get(message.from_user.id) == "aula" and message.text in UnisaFreeRooms.buildings)
@@ -159,6 +159,14 @@ def print_free_hours_for_classroom(message):
     bot.send_message(message.chat.id, format_string, reply_markup=telebot.types.ReplyKeyboardRemove())
 
     set_user_prev_command(message.from_user.id, "None")
+
+
+@bot.message_handler(func=lambda message: users.get(message.from_user.id) == "now_edifici" and message.text in UnisaFreeRooms.buildings)
+def print_free_hours_right_now(message):
+    bot.send_message(message.chat.id, UnisaFreeRooms.get_all_free_rooms_right_now(message.text), reply_markup=telebot.types.ReplyKeyboardRemove())
+    
+    set_user_prev_command(message.from_user.id, "None")
+
 
 update_db_thread = threading.Thread(target=update_users_db, daemon=True)
 update_db_thread.start()
