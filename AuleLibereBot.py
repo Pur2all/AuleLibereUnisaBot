@@ -1,4 +1,5 @@
 import datetime
+from shutil import Error
 import UnisaFreeRooms
 import os
 import re
@@ -77,7 +78,10 @@ def send_message_to_all_users(message):
     message = re.search(r"(?<=\/admin_message ).+", message.text).group()
 
     for user in users:
-        bot.send_message(user, message)
+        try:
+            bot.send_message(user, message)
+        except Exception:
+            del users[user]
         time.sleep(0.1)
 
 
@@ -127,7 +131,7 @@ def print_classrooms_keyboard(message):
 @bot.message_handler(func=lambda message: users.get(message.from_user.id) == "edifici" and message.text in UnisaFreeRooms.buildings)
 def print_free_hours_for_building(message):
     building = message.text
-    free_times = UnisaFreeRooms.format_time(UnisaFreeRooms.get_all_rooms_events_for_building(building))
+    free_times = UnisaFreeRooms.get_all_rooms_events_for_building(building)
     format_string = ""
 
     for room, free in free_times.items():
@@ -135,6 +139,7 @@ def print_free_hours_for_building(message):
             format_string += room + " è occupata tutto il giorno\n"
         else:
             format_string += room + " è libera nei seguenti orari:\n"
+            free = UnisaFreeRooms.format_time(free)
             for interval in free:
                 format_string += "- Dalle " + interval[0] + " alle " + interval[1] + "\n"
         format_string += "\n\n"
@@ -146,7 +151,7 @@ def print_free_hours_for_building(message):
 
 @bot.message_handler(func=lambda message: users.get(message.from_user.id) == "aula" and message.text in UnisaFreeRooms.rooms_for_buildings[UnisaFreeRooms.buildings[selected_building_for_user[message.from_user.id]]])
 def print_free_hours_for_classroom(message):
-    free_times = UnisaFreeRooms.format_time(UnisaFreeRooms.get_all_rooms_events_for_building(selected_building_for_user[message.from_user.id]))[message.text]
+    free_times = UnisaFreeRooms.format_time(UnisaFreeRooms.get_all_rooms_events_for_building(selected_building_for_user[message.from_user.id])[message.text])
     
     if not free_times:
         format_string = "L'aula è occupata tutto il giorno"

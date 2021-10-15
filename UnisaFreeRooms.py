@@ -63,7 +63,7 @@ def format_time(list_of_times):
     len_of_list = len(list_of_times)
 
     for i in range(len_of_list):
-        start, end = list_of_times[i], list_of_times[i]
+        start, end = list_of_times[i][0], list_of_times[i][1]
         list_of_times[i] = (f"{start.hour:02d}:{start.minute:02d}",
                             f"{end.hour:02d}:{end.minute:02d}")
 
@@ -140,7 +140,7 @@ def get_all_free_rooms_right_now(building=None):
                     break
             
             if room_free_times_from_now != "":
-                building_free_times_from_now += f"{room} è libera {room_free_times_from_now}"
+                building_free_times_from_now += f"- {room} è libera {room_free_times_from_now}"
 
     if "libera" not in building_free_times_from_now:
         building_free_times_from_now = f"Nell'edificio {building} non ci sono aule libere in questo momento\n"
