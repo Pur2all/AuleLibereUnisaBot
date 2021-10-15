@@ -157,8 +157,8 @@ def print_free_hours_for_classroom(message):
     else:
         format_string = "L'aula è libera nei seguenti orari:\n"
 
-        for time in free_times:
-            format_string += "- Dalle " + time[0] + " alle " + time[1] + "\n"
+        for free_time in free_times:
+            format_string += "- Dalle " + free_time[0] + " alle " + free_time[1] + "\n"
 
     bot.send_message(message.chat.id, format_string, reply_markup=telebot.types.ReplyKeyboardRemove())
 
