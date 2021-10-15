@@ -1,12 +1,11 @@
 import datetime
-from shutil import Error
-import UnisaFreeRooms
+import time
+import threading
 import os
 import re
 import redis
 import telebot
-import time
-import threading
+import UnisaFreeRooms
 
 
 TOKEN_BOT = os.environ["TOKEN_BOT"]
@@ -75,7 +74,7 @@ def send_welcome(message):
 
 @bot.message_handler(func=lambda message: "/admin_message" in message.text and str(message.from_user.id) in ADMINS)
 def send_message_to_all_users(message):
-    message = re.search(r"(?<=\/admin_message ).+", message.text).group()
+    message = re.search(r"(?<=\/admin_message )[\s\S]+", message.text).group()
 
     for user in list(users):
         try:
