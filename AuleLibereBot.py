@@ -51,7 +51,7 @@ def set_user_prev_command(user_id, prev_command):
 def update_users_db():
     while True:
         time.sleep(60 * 60)
-        redis_connection.hset("users", users)
+        redis_connection.hset("users", mapping=users)
         print("Users db updated")
 
 
@@ -66,7 +66,7 @@ users = redis_connection.hgetall("users")
 def send_welcome(message):
     set_user_prev_command(message.from_user.id, "start")
 
-    redis_connection.hset("users", users)
+    redis_connection.hset("users", mapping=users)
 
     bot.send_message(message.chat.id,
     "Questo è un bot per cercare le aule libere ad Unisa, buona fortuna!\n\nInvia /help per avere una breve descrizione del bot")
