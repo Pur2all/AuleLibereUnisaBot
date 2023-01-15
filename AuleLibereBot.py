@@ -89,14 +89,17 @@ def print_buildings_keyboard(message):
     markup = make_buildings_keyboard_markup()
     prev_command = None
 
-    if datetime.date.today().weekday() < 5:
-        prev_command = message.text.replace("/", "")
+    try:
+        if datetime.date.today().weekday() < 5:
+            prev_command = message.text.replace("/", "")
 
-        bot.send_message(message.chat.id, "Scegli un edificio:", reply_markup=markup)
-    else:
-        bot.send_message(message.chat.id, "Oggi l'università è chiusa, studia a casa!")
-    
-    set_user_prev_command(message.from_user.id, prev_command)
+            bot.send_message(message.chat.id, "Scegli un edificio:", reply_markup=markup)
+        else:
+            bot.send_message(message.chat.id, "Oggi l'università è chiusa, studia a casa!")
+
+        set_user_prev_command(message.from_user.id, prev_command)
+    except Exception:
+        del users[message.from_user.id]
 
 
 @bot.message_handler(commands=["help"])
@@ -114,7 +117,10 @@ def print_help_message(message):
         "Il codice di questo bot è pubblico, lo puoi trovare cliccando su questo link -> https://github.com/Pur2all/AuleLibereUnisaBot \n" + \
         "Sentiti libero di contribuire!"
 
-    bot.send_message(message.chat.id, help_message)
+    try:
+        bot.send_message(message.chat.id, help_message)
+    except Exception:
+        del users[message.from_user.id]
 
 
 @bot.message_handler(func=lambda message: users.get(message.from_user.id) == "aula" and message.text in UnisaFreeRooms.buildings)
@@ -124,7 +130,10 @@ def print_classrooms_keyboard(message):
 
     markup_classroom = make_classroom_keyboard_markup(building)
 
-    bot.send_message(message.chat.id, "Scegli una classe:", reply_markup=markup_classroom)
+    try:
+        bot.send_message(message.chat.id, "Scegli una classe:", reply_markup=markup_classroom)
+    except Exception:
+        del users[message.from_user.id]
 
 
 @bot.message_handler(func=lambda message: users.get(message.from_user.id) == "edifici" and message.text in UnisaFreeRooms.buildings)
@@ -143,9 +152,12 @@ def print_free_hours_for_building(message):
                 format_string += "- Dalle " + interval[0] + " alle " + interval[1] + "\n"
         format_string += "\n\n"
 
-    bot.send_message(message.chat.id, format_string, reply_markup=telebot.types.ReplyKeyboardRemove())
+    try:
+        bot.send_message(message.chat.id, format_string, reply_markup=telebot.types.ReplyKeyboardRemove())
 
-    set_user_prev_command(message.from_user.id, "None")
+        set_user_prev_command(message.from_user.id, "None")
+    except Exception:
+        del users[message.from_user.id]
 
 
 @bot.message_handler(func=lambda message: users.get(message.from_user.id) == "aula" and message.text in UnisaFreeRooms.rooms_for_buildings[UnisaFreeRooms.buildings[selected_building_for_user[message.from_user.id]]])
@@ -160,16 +172,22 @@ def print_free_hours_for_classroom(message):
         for free_time in free_times:
             format_string += "- Dalle " + free_time[0] + " alle " + free_time[1] + "\n"
 
-    bot.send_message(message.chat.id, format_string, reply_markup=telebot.types.ReplyKeyboardRemove())
+    try:
+        bot.send_message(message.chat.id, format_string, reply_markup=telebot.types.ReplyKeyboardRemove())
 
-    set_user_prev_command(message.from_user.id, "None")
+        set_user_prev_command(message.from_user.id, "None")
+    except Exception:
+        del users[message.from_user.id]
 
 
 @bot.message_handler(func=lambda message: users.get(message.from_user.id) == "now_edifici" and message.text in UnisaFreeRooms.buildings)
 def print_free_hours_right_now(message):
-    bot.send_message(message.chat.id, UnisaFreeRooms.get_all_free_rooms_right_now(message.text), reply_markup=telebot.types.ReplyKeyboardRemove())
-    
-    set_user_prev_command(message.from_user.id, "None")
+    try:
+        bot.send_message(message.chat.id, UnisaFreeRooms.get_all_free_rooms_right_now(message.text), reply_markup=telebot.types.ReplyKeyboardRemove())
+
+        set_user_prev_command(message.from_user.id, "None")
+    except Exception:
+        del users[message.from_user.id]
 
 
 update_db_thread = threading.Thread(target=update_users_db, daemon=True)
